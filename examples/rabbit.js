@@ -21,8 +21,8 @@ App.prototype.start = function() {
   
   this.rabbit.monitor(options);
 
-  this.rabbit.on('snitch', function(options) {
-    var notification = "The following resource is not responding "  + options.host ;
+  this.rabbit.on('snitch', function(host) {
+    var notification = "The following rabbit is not responding "  + host ;
     console.log(notification);
   });
 };
