@@ -3,7 +3,14 @@
 
 A monitoring solution for Apis, RabbitMQ, MongoDb and Redis
 
-Support for RabbitMQ, MongoDb and Redis will follow.
+
+## TODO
+===========
+* Support for RabbitMQ, MongoDb and Redis
+
+* Administration tool which lists the running processes for each supported type
+
+
 
 
 ## api
@@ -29,10 +36,13 @@ this.api.monitor("http://www.airasoul.net");
 this.api.monitor("http://blog.airasoul.net");
 ```
 
-The ```snitch``` event is fired due to a site not responding based on the above options:
+The ```snitch``` event is fired due to a site not responding based on the above options.
+At this point you can send a notification (sms or email etc) or log an entry in a database or logger. 
 
 ```
 this.api.on('snitch', function(url) {
+  //notify
+}
 ```
 
 The following is a complete example:
@@ -60,4 +70,7 @@ App.prototype.start = function() {
 };
 
 module.exports = App;
+
+var app = new App();
+app.start();
 ```
