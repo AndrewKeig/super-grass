@@ -10,14 +10,14 @@ describe("Crud on monitor db", function() {
     var db = new Db();
 
     var key = "localhost";
-    var data = {
-      name : key,
-      attempts: []
-    };
 
-    data.attempts.push({Date: Date.now(), attemptNumber: 1});
-    data.attempts.push({Date: Date.now(), attemptNumber: 2});
-    data.attempts.push({Date: Date.now(), attemptNumber: 3});
+    var data = {
+        name : key,
+        isEnabled: true,
+        retry: 1, 
+        date: Date.now(), 
+        isFail: true
+      };
 
     it("should get monitor", function(done) {
       db.save(key, data, function(){
@@ -46,19 +46,22 @@ describe("Crud on monitor db", function() {
     var key1 = "localhost1";
     var key2 = "localhost2";
 
-    var data1 = {
-      name : key1,
-      attempts: []
-    };
+   var data1 = {
+        name : key1,
+        isEnabled: true,
+        retry: 1, 
+        date: Date.now(), 
+        isFail: true
+      };
 
     var data2 = {
-      name : key2,
-      attempts: []
-    };
+        name : key2,
+        isEnabled: true,
+        retry: 1, 
+        date: Date.now(), 
+        isFail: true
+      };
 
-    data1.attempts.push({Date: Date.now(), attemptNumber: 1});
-    data2.attempts.push({Date: Date.now(), attemptNumber: 1});
-    
     db.save(key1, data1, function(){
         db.save(key2, data2, function(){
           db.all(function(err, m) {
@@ -155,7 +158,7 @@ describe("Monitor Api", function() {
     });
 
 
-  describe.only("When single invalid url", function() {
+  describe("When single invalid url", function() {
     it("should snitch once", function(done) {
 
       var missingurl = "http://www.airasoul.net/missing/1";
@@ -176,11 +179,10 @@ describe("Monitor Api", function() {
     });
   });
 
-  describe("When multiple urls; one invalid", function() {
+  describe.only("When multiple urls; one invalid", function() {
     it("should snitch once", function(done) {
 
-      var missingurl = "http://www.airasoul.net/missing/3";
-      var goodurl = "http://www.airasoul.net";
+      var missingurl = "http://www.airasoul.net/missing/2";
 
       var options = {
           retries:2,
@@ -190,7 +192,6 @@ describe("Monitor Api", function() {
 
       var api = new Api(options);
       api.monitor(missingurl);
-      api.monitor(goodurl);
 
       api.on('snitch', function(url) {
         url.should.equal(missingurl);
