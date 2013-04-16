@@ -1,30 +1,78 @@
 var should = require("should");
 var Api = require('../lib/api');
 var Rabbit = require('../lib/rabbit');
-var Monitor = require('../lib/db');
+var Db = require('../lib/db');
 
-// describe("Save Monitor", function() {
-//   describe.only("When we save a monitor", function() {
-//     var monitor = new Monitor();
+// testing the crud db
 
-//     it("should save monitor", function(done) {
+describe("Crud on monitor db", function() {
+  describe("When we save a monitor", function() {
+    var db = new Db();
 
-//       var key = "localhost";
-//       var data = {
-//         name : key,
-//         failTime: Date.now(),
-//         failureNumber: 1
-//       };
+    var key = "localhost";
+    var data = {
+      name : key,
+      attempts: []
+    };
 
-//       monitor.save(key, data, function(){
-//         monitor.get(key, function(err, m) {
-//           m.name.should.equal(key);
-//           done();
-//         });
-//       });
-//     });
-//   });
-// });
+    data.attempts.push({Date: Date.now(), attemptNumber: 1});
+    data.attempts.push({Date: Date.now(), attemptNumber: 2});
+    data.attempts.push({Date: Date.now(), attemptNumber: 3});
+
+    it("should get monitor", function(done) {
+      db.save(key, data, function(){
+        db.get(key, function(err, m) {
+          m.name.should.equal(key);
+          done();
+        });
+      });
+    });
+
+    it("should find monitor", function(done) {
+      db.save(key, data, function(){
+        db.find({name:key}, function(err, m) {
+          m[key].name.should.equal(key);
+          done();
+        });
+      });
+    });
+  });
+
+  describe("When we save multiple monitors", function() {
+    var db = new Db();
+
+    it("should return list of monitors", function(done) {
+
+    var key1 = "localhost1";
+    var key2 = "localhost2";
+
+    var data1 = {
+      name : key1,
+      attempts: []
+    };
+
+    var data2 = {
+      name : key2,
+      attempts: []
+    };
+
+    data1.attempts.push({Date: Date.now(), attemptNumber: 1});
+    data2.attempts.push({Date: Date.now(), attemptNumber: 1});
+    
+    db.save(key1, data1, function(){
+        db.save(key2, data2, function(){
+          db.all(function(err, m) {
+            m[key1].name.should.equal(key1);
+            m[key2].name.should.equal(key2);
+            done();
+          });
+        });
+      });
+    });
+  });
+});
+
+// testing the monitor api
 
 describe("Monitor Api", function() {
    describe("When we do not provide options to api", function() {
@@ -102,54 +150,57 @@ describe("Monitor Api", function() {
       }
 
       it("should throw error", function() {
-        console.log(error);
-          error.toString().should.include("You must provide a url");
+        error.toString().should.include("You must provide a url");
+      });
+    });
+
+
+  describe.only("When single invalid url", function() {
+    it("should snitch once", function(done) {
+
+      var missingurl = "http://www.airasoul.net/missing/1";
+
+      var options = {
+          retries:2,
+          timeout:1,
+          minutes_between_notification:1
+      }
+
+      var api = new Api(options);
+      api.monitor(missingurl);
+
+      api.on('snitch', function(url) {
+        url.should.equal(missingurl);
+        done();
       });
     });
   });
-//   describe("When single invalid url", function() {
-//     it("should snitch once", function(done) {
 
-//       var actualurl = "http://www.airasoul.net/missing/1";
+  describe("When multiple urls; one invalid", function() {
+    it("should snitch once", function(done) {
 
-//       var options = {
-//           retries:2,
-//           timeout:1,
-//           minutes_between_notification:1
-//       }
+      var missingurl = "http://www.airasoul.net/missing/3";
+      var goodurl = "http://www.airasoul.net";
 
-//       var api = new Api(options);
-//       api.monitor(actualurl);
+      var options = {
+          retries:2,
+          timeout:1,
+          minutes_between_notification:1
+      }
 
-//       api.on('snitch', function(url) {
-//         url.should.equal(actualurl);
-//         done();
-//       });
-//     });
-//   });
+      var api = new Api(options);
+      api.monitor(missingurl);
+      api.monitor(goodurl);
 
-//   describe("When multiple urls; one invalid", function() {
-//     it("should snitch once", function(done) {
-//       var actualurl = "http://www.airasoul.net/missing/3";
-//       var goodurl = "http://www.airasoul.net";
+      api.on('snitch', function(url) {
+        url.should.equal(missingurl);
+        done();
+      });
+    });
+  });
+});
 
-//       var options = {
-//           retries:2,
-//           timeout:1,
-//           minutes_between_notification:1
-//       }
-
-//       var api = new Api(options);
-//       api.monitor(actualurl);
-//       api.monitor(goodurl);
-
-//       api.on('snitch', function(url) {
-//         url.should.equal(actualurl);
-//         done();
-//       });
-//     });
-//   });
-// });
+// testing the monitor rabbit
 
 // describe("Monitor Rabbit", function() {
 //   describe("When we do not provide options to rabbit", function() {
