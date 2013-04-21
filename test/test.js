@@ -1,310 +1,356 @@
-var should = require("should");
-var Api = require('../lib/api');
-var Rabbit = require('../lib/rabbit');
-var Db = require('../lib/db');
+var should = require("should")
+, SuperGrass = require('../lib/supergrass');
 
-// testing the crud db
 
-describe("Crud on monitor db", function() {
-  describe("When we save a monitor", function() {
-    var db = new Db();
-
-    var key = "localhost";
-
-    var data = {
-        name : key,
-        isEnabled: true,
-        retry: 1, 
-        date: Date.now(), 
-        isFail: true
-      };
-
-    it("should get monitor", function(done) {
-      db.save(key, data, function(){
-        db.get(key, function(err, m) {
-          m.name.should.equal(key);
-          done();
-        });
-      });
-    });
-
-    it("should find monitor", function(done) {
-      db.save(key, data, function(){
-        db.find({name:key}, function(err, m) {
-          m[key].name.should.equal(key);
-          done();
-        });
-      });
-    });
-  });
-
-  describe("When we save multiple monitors", function() {
-    var db = new Db();
-
-    it("should return list of monitors", function(done) {
-
-    var key1 = "localhost1";
-    var key2 = "localhost2";
-
-   var data1 = {
-        name : key1,
-        isEnabled: true,
-        retry: 1, 
-        date: Date.now(), 
-        isFail: true
-      };
-
-    var data2 = {
-        name : key2,
-        isEnabled: true,
-        retry: 1, 
-        date: Date.now(), 
-        isFail: true
-      };
-
-    db.save(key1, data1, function(){
-        db.save(key2, data2, function(){
-          db.all(function(err, m) {
-            m[key1].name.should.equal(key1);
-            m[key2].name.should.equal(key2);
-            done();
-          });
-        });
-      });
-    });
-  });
-});
-
-// testing the monitor api
-
+// monitoring api
 describe("Monitor Api", function() {
-   describe("When we do not provide options to api", function() {
-    var api, error;
+
+   describe("When we do not provide options", function() {
+    var superGrass, error;
 
     try { 
-      api = new Api();
+      superGrass = new SuperGrass();
     } catch (err) {
-      error = err
+      error = err;
     }
 
-    it("should contain correct retry value", function() {
+    it("should throw error", function() {
         error.toString().should.include("Error: Please provide options");
     });
   });
 
-  describe("When we do not provide option to api for retry", function() {
-    var options = {
-        timeout:1,
-        minutes_between_notification:1
-    }
+  describe("When we do not provide options for retry", function() {
 
-    var api, error;
+    var options = {
+      settings: {
+        interval: "5000",
+        retry: null,
+        retryTimeout: "1000"
+      }
+    , resources: 
+      []
+    };
+
+    var superGrass, error;
 
     try { 
-      api = new Api(options);
+      superGrass = new SuperGrass(options);
     } catch (err) {
-      error = err
+      error = err;
     }
 
     it("should throw error", function() {
-        error.toString().should.include("Error: Please provide a retry value");
+        error.toString().should.include("Error: Please provide a number of retries");
     });
   });
 
-  describe("When we provide options to api", function() {
-    var options = {
-        retries:2,
-        timeout:1,
-        minutes_between_notification:1
+  describe("When we do not provide option for retryTimeout", function() {
+     var options = {
+      settings: {
+        interval: "5000",
+        retry: 3,
+        retryTimeout: null
+      }
+    , resources: 
+      []
+    };
+
+    var superGrass, error;
+
+    try { 
+      superGrass = new SuperGrass(options);
+    } catch (err) {
+      error = err;
     }
 
-    var api = new Api(options);
+    it("should throw error", function() {
+        error.toString().should.include("Error: Please provide a timeout value in minutes between retries");
+    });
+  });
+
+  describe("When we do not provide option for interval", function() {
+    var options = {
+      settings: {
+        interval: null,
+        retry: 3,
+        retryTimeout: 1000
+      }
+    , resources: 
+      []
+    };
+
+
+    var superGrass, error;
+
+    try { 
+      superGrass = new SuperGrass(options);
+    } catch (err) {
+      error = err;
+    }
+
+    it("should throw error", function() {
+        error.toString().should.include("Error: Please provide a interval in minutes between notification value");
+    });
+  });
+
+  describe("When we provide options", function() {
+    var options = {
+      settings: {
+        interval: 1000,
+        retry: 3,
+        retryTimeout: 5000
+      }
+    , resources: 
+      []
+    };
+
+    var superGrass = new SuperGrass(options);
 
     it("should contain correct retry value", function() {
-        api.retries.should.equal(2);
+        superGrass.retry.should.equal(3);
     });
 
     it("should contain correct timeout value", function() {
-        api.timeout.should.equal(1);
+        superGrass.retryTimeout.should.equal(5000);
     });
 
     it("should contain correct minutes between notification value", function() {
-        api.timeout.should.equal(1);
+        superGrass.interval.should.equal(1000);
     });
   });
 
-  describe("When we do not provide a url to api", function() {
-      var actualurl = "";
+
+  describe("When single invalid api resources", function() {
+    it("should snitch with single invalid resource in report", function(done) {
+
+      var resource = {
+        type: "api",
+        host: "http://127.0.0.1:2000",
+        enabled : true
+      };
 
       var options = {
-          retries:2,
-          timeout:1,
-          minutes_between_notification:1
-      }
+        settings: {
+          interval: 100,
+          retry: 3,
+          retryTimeout: 1
+        }
+      , resources: 
+        []
+      };
+      options.resources.push(resource);
 
-      var api, error;
+      var superGrass = new SuperGrass(options);
+      superGrass.watch();
 
-      api = new Api(options);
+      superGrass.on('snitch', function(report) {
+        report.length.should.equal(options.settings.retry);
+        report[0].should.have.keys(['url', 'fails']);
+        report[0].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[0].should.have.property('fails').equal(1);
 
-      try {
-        api.monitor(actualurl);
-      } catch (err) {
-        error = err
-      }
+        report[1].should.have.keys(['url', 'fails']);
+        report[1].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[1].should.have.property('fails').equal(1);
 
-      it("should throw error", function() {
-        error.toString().should.include("You must provide a url");
-      });
-    });
-
-
-  describe("When single invalid url", function() {
-    it("should snitch once", function(done) {
-
-      var missingurl = "http://www.airasoul.net/missing/1";
-
-      var options = {
-          retries:2,
-          timeout:1,
-          minutes_between_notification:1
-      }
-
-      var api = new Api(options);
-      api.monitor(missingurl);
-
-      api.on('snitch', function(url) {
-        url.should.equal(missingurl);
+        report[2].should.have.keys(['url', 'fails']);
+        report[2].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[2].should.have.property('fails').equal(1);
         done();
       });
     });
   });
 
-  describe.only("When multiple urls; one invalid", function() {
-    it("should snitch once", function(done) {
+  describe("When multiple invalid api resources", function() {
+    it("should snitch with multiple invalid esources in report", function(done) {
 
-      var missingurl = "http://www.airasoul.net/missing/2";
+      var resource1 = {
+        type: "api",
+        host: "http://127.0.0.1:2000",
+        enabled : true
+      };
+
+      var resource2 = {
+        type: "api",
+        host: "http://127.0.0.1:3000",
+        enabled : true
+      };
 
       var options = {
-          retries:2,
-          timeout:1,
-          minutes_between_notification:1
-      }
+        settings: {
+          interval: 100,
+          retry: 3,
+          retryTimeout: 1
+        }
+      , resources: 
+        []
+      };
+      options.resources.push(resource1);
+      options.resources.push(resource2);
 
-      var api = new Api(options);
-      api.monitor(missingurl);
+      var superGrass = new SuperGrass(options);
+      superGrass.watch();
 
-      api.on('snitch', function(url) {
-        url.should.equal(missingurl);
+      superGrass.on('snitch', function(report) {
+        report.length.should.equal(options.settings.retry*options.resources.length);
+        report[0].should.have.keys(['url', 'fails']);
+        report[0].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[0].should.have.property('fails').equal(1);
+
+        report[1].should.have.keys(['url', 'fails']);
+        report[1].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[1].should.have.property('fails').equal(1);
+
+        report[2].should.have.keys(['url', 'fails']);
+        report[2].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[2].should.have.property('fails').equal(1);
+
+        report[3].should.have.keys(['url', 'fails']);
+        report[3].should.have.property('url').equal('http://127.0.0.1:3000');
+        report[3].should.have.property('fails').equal(1);
+
+        report[4].should.have.keys(['url', 'fails']);
+        report[4].should.have.property('url').equal('http://127.0.0.1:3000');
+        report[4].should.have.property('fails').equal(1);
+
+        report[5].should.have.keys(['url', 'fails']);
+        report[5].should.have.property('url').equal('http://127.0.0.1:3000');
+        report[5].should.have.property('fails').equal(1);
         done();
       });
     });
   });
-});
 
-// testing the monitor rabbit
+  describe("When single invalid api resource but multiple resources", function() {
+    it("should snitch with single invalid resource in report", function(done) {
 
-// describe("Monitor Rabbit", function() {
-//   describe("When we do not provide options to rabbit", function() {
-//     var rabbit, error;
+      var resource1 = {
+        type: "api",
+        host: "http://127.0.0.1:2000",
+        enabled : true
+      };
 
-//     try { 
-//       api = new Rabbit();
-//     } catch (err) {
-//       error = err
-//     }
+      var resource2 = {
+        type: "api",
+        host: "http://blog.airasoul.net",
+        enabled : true
+      };
 
-//     it("should contain correct retry value", function() {
-//         error.toString().should.include("Error: Please provide options");
-//     });
-//   });
+     var options = {
+        settings: {
+          interval: 1,
+          retry: 1,
+          retryTimeout: 1
+        }
+      , resources: 
+        []
+      };
+      options.resources.push(resource1);
+      options.resources.push(resource2);
 
-//   describe("When we do not provide option to rabbit for retry", function() {
-//     var options = {
-//         timeout:1,
-//         minutes_between_notification:1
-//     }
+      var superGrass = new SuperGrass(options);
+      superGrass.watch();
 
-//     var rabbit, error;
+      superGrass.on('snitch', function(report) {
+        report.length.should.equal(options.settings.retry*options.resources.length);
+        report[0].should.have.keys(['url', 'fails']);
+        report[0].should.have.property('url').equal('http://127.0.0.1:2000');
+        report[0].should.have.property('fails').equal(1);
 
-//     try { 
-//       api = new Rabbit(options);
-//     } catch (err) {
-//       error = err
-//     }
+        report[1].should.have.keys(['url', 'fails']);
+        report[1].should.have.property('url').equal('http://blog.airasoul.net');
+        report[1].should.have.property('fails').equal(0);
+        done();
+      });
+    });
+  });
 
-//     it("should throw error", function() {
-//         error.toString().should.include("Error: Please provide a retry value");
-//     });
-//   });
+  describe("When single valid rabbit resources", function() {
+    it("should snitch with single valid resource in report", function(done) {
 
-//   describe("When we provide options to rabbit", function() {
-//     var options = {
-//         retries:2,
-//         timeout:1,
-//         minutes_between_notification:1
-//     }
+      var resource = { host: "localhost"
+        , port: 5672
+        , login: "guest"
+        , password: "guest"
+        , vhost: '/'
+        , enabled : true
+        , type: "rabbit"
+      };
 
-//     var rabbit = new Rabbit(options);
 
-//     it("should contain correct retry value", function() {
-//         rabbit.retries.should.equal(2);
-//     });
+      var options = {
+        settings: {
+          interval: 100,
+          retry: 3,
+          retryTimeout: 1
+        }
+      , resources: 
+        []
+      };
+      options.resources.push(resource);
 
-//     it("should contain correct timeout value", function() {
-//         rabbit.timeout.should.equal(1);
-//     });
+      var superGrass = new SuperGrass(options);
+      superGrass.watch();
 
-//     it("should contain correct minutes between notification value", function() {
-//         rabbit.timeout.should.equal(1);
-//     });
-//   });
+      superGrass.on('snitch', function(report) {
+        report.length.should.equal(options.settings.retry);
+        report[0].should.have.keys(['url', 'fails']);
+        report[0].should.have.property('url').equal('localhost');
+        report[0].should.have.property('fails').equal(0);
 
-//   describe("When we do not provide connection option to rabbit", function() {
-//       var options = {
-//           retries:2,
-//           timeout:1,
-//           minutes_between_notification:1
-//       }
+        report[1].should.have.keys(['url', 'fails']);
+        report[1].should.have.property('url').equal('localhost');
+        report[1].should.have.property('fails').equal(0);
 
-//       var rabbit, error;
+        report[2].should.have.keys(['url', 'fails']);
+        report[2].should.have.property('url').equal('localhost');
+        report[2].should.have.property('fails').equal(0);
+        done();
+      });
+    });
+  });
 
-//       rabbit = new Rabbit(options);
+  describe("When single invalid rabbit resources", function() {
+    it("should snitch with single resource in report", function(done) {
 
-//       try {
-//         rabbit.monitor();
-//       } catch (err) {
-//         error = err
-//       }
+      var resource = { host: "localhost1"
+        , port: 5672
+        , login: "guest"
+        , password: "guest"
+        , vhost: '/'
+        , enabled : true
+        , type: "rabbit"
+      };
 
-//       it("should throw error", function() {
-//           error.toString().should.include("You must provide connection options");
-//       });
-//     });
+       var options = {
+        settings: {
+          interval: 100,
+          retry: 3,
+          retryTimeout: 1
+        }
+      , resources: 
+        []
+      };
+      options.resources.push(resource);
 
-//   describe("When unable to connect to rabbitMq", function() {
+      var superGrass = new SuperGrass(options);
+      superGrass.watch();
 
-//     it("should snitch once", function(done) {
-//       var options = {
-//           retries:2,
-//           timeout:1,
-//           minutes_between_notification:1
-//       }
+      superGrass.on('snitch', function(report) {
+        report.length.should.equal(options.settings.retry);
+        report[0].should.have.keys(['url', 'fails']);
+        report[0].should.have.property('url').equal('localhost1');
+        report[0].should.have.property('fails').equal(1);
 
-//       var conOptions = { 
-//         host: 'localhost'
-//         , port: 5672
-//         , login: 'guest'
-//         , password: 'guest'
-//         , vhost: '/'
-//       };
+        report[1].should.have.keys(['url', 'fails']);
+        report[1].should.have.property('url').equal('localhost1');
+        report[1].should.have.property('fails').equal(1);
 
-//       var rabbit = new Rabbit(options);
-//       rabbit.monitor(conOptions);
-
-//       rabbit.on('snitch', function(options) {
-//         options.should.equal(conOptions);
-//         done();
-//       });
-//     });
-//   });
-// });
+        report[2].should.have.keys(['url', 'fails']);
+        report[2].should.have.property('url').equal('localhost1');
+        report[2].should.have.property('fails').equal(1);
+        done();
+      });
+    });
+  });
+ });

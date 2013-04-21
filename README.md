@@ -1,149 +1,117 @@
 #super-grass
 ===========
 
-A monitoring solution for Apis, RabbitMQ, MongoDb and Redis
+A node.js monitoring tool supporting apis and rabbitmq.
+
+This tool will allows you to define various resources to be monitored; at a configurable interval.  A report is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferd form of notificaion and/or logging.
 
 
 ## TODO
 ===========
-* Support for RabbitMQ, MongoDb and Redis
-
-* Administration tool which lists the running processes for each supported type
-
+* Support MongoDb and Redis, REST POST/PUT/DELETE requests
+* An administration tool which lists the running processes for each supported type
 
 
 
-## api
+## options
 ===========
 
-The below demonstrates monitoring a website; we simply create a new ```Api``` passing an ```options``` object.
-
-This options contains 3 values:
-
-* ```retries``` - number of retries before firing the ```snitch``` event
-* ```timeout``` - a timeout value between retries
-* ```minutes_between_notification``` - a value; which can be used to avoid repeatedly firing the same event; by delaying notification
-
-We can monitor a website with the following line of code:
+In order to use super-grass; simply create an options object with the following properties.
 
 ```
-this.api.monitor("http://www.airasoul.net");
-```
-We can also monitor multiple websites by simply calling monitor multiple times like so:
-
-```
-this.api.monitor("http://www.airasoul.net");
-this.api.monitor("http://blog.airasoul.net");
-```
-
-The ```snitch``` event is fired due to a site not responding based on the above options.
-At this point you can send a notification (sms or email etc) or log an entry in a database or logger. 
-
-```
-this.api.on('snitch', function(url) {
-  //notify
-}
-```
-
-The following is a complete example:
-
-```
-var Api = require("super-grass").api;
-
-var App = function() {
-  var options = {
-    retries:3,
-    timeout:10,
-    minutes_between_notification:30
+options = {
+  settings: {
+    interval: "5000",
+    retry: "3",
+    retryTimeout: "1000"
   }
-
-  this.api = new Api(options);
+, resources: 
+  [{
+    type: "api",
+    host: "http://airasoul.net",
+    enabled : true
+  },
+  {
+    type: "api",
+    host: "http://blog.airasoul.net",
+    enabled : true
+  },
+  { host: "rabbit-server"
+    , port: 5672
+    , login: "guest"
+    , password: "guest"
+    , vhost: '/'
+    , enabled : true
+    , type: "rabbit"
+  }]
 };
-
-App.prototype.start = function() {
-  this.api.monitor("http://www.airasoul.net");
-
-  this.api.on('snitch', function(url) {
-    var notification = "The following resource is not responding "  + url ;
-    console.log(notification);
-  });
-};
-
-module.exports = App;
-
-var app = new App();
-app.start();
 ```
 
-## rabbitmq
+This options settings contains:
+
+* ```interval``` - the interval between notifications
+* ```retry``` - the number of retries for a resource
+* ```retryTimeout``` - a timeout value between retries
+* ```resources``` - a list of resources to be monitored
+
+ 
+## supported types
 ===========
+We currently support the ability to monitor:
 
-The below demonstrates monitoring a rabbitmq instance; we simply create a new ```Rabbit``` passing an ```options``` object.
-
-This options contains 3 values:
-
-* ```retries``` - number of retries before firing the ```snitch``` event
-* ```timeout``` - a timeout value between retries
-* ```minutes_between_notification``` - a value; which can be used to avoid repeatedly firing the same event; by delaying notification
-
-We can monitor a website with the following line of code:
+A get request
 
 ```
-var options = { 
-    host: 'localhost'
+{
+	type: "api",
+    host: "http://airasoul.net",
+    enabled : true
+ }
+```
+
+A rabbitmq server (send message to queue; and consume it)
+
+
+```
+{ 
+    host: "rabbit-server"
     , port: 5672
     , login: 'guest'
     , password: 'guest'
     , vhost: '/'
-  };
-  
-  this.rabbit.monitor(options);
-  
-```
-
-The ```snitch``` event is fired due to a site not responding based on the above options.
-At this point you can send a notification (sms or email etc) or log an entry in a database or logger. 
-
-```
-this.rabbit.on('snitch', function(host	) {
-  //notify
 }
 ```
-
-The following is a complete example:
-
-```
-var Rabbit = require("super-grass").rabbit;
-
-var App = function() {
-  var options = {
-    retries:3,
-    timeout:1000,
-    minutes_between_notification:1
-  }
-
-  this.rabbit = new Rabbit(options);
-};
-
-App.prototype.start = function() {
-  var options = { 
-    host: 'localhost'
-    , port: 5672
-    , login: 'guest'
-    , password: 'guest'
-    , vhost: '/'
-  };
   
-  this.rabbit.monitor(options);
+## example
+===========
 
-  this.rabbit.on('snitch', function(host) {
-    var notification = "The following rabbit is not responding "  + host ;
-    console.log(notification);
-  });
-};
+The code is simple; you create a ```super-grass``` object; start watching and wait for a response; the ```snitch``` event to fire.
 
-module.exports = App;
-
-var app = new App();
-app.start();
 ```
+var SuperGrass = require('supergrass')
+    , options = require('./options');
+
+var superGrass = new SuperGrass(options);
+superGrass.watch();
+
+superGrass.on('snitch', function(report) {
+  console.log("RESULTS", report);
+});
+```
+
+The report returned contains an array of activity; each resource is returned with a failure identifier; each line in the report represents a single retry.
+
+```
+ {url: http://airasoul.net, fails: 1},
+ {url: http://airasoul.net, fails: 1},
+ {url: http://airasoul.net, fails: 1},
+ {url: http://blog.airasoul.net, fails: 1},
+ {url: http://blog.airasoul.net, fails: 1},
+ {url: http://blog.airasoul.net, fails: 1},
+ {url: http://rabbit-server, fails: 1},
+ {url: http://rabbit-server, fails: 1},
+ {url: http://rabbit-server, fails: 1}
+
+```
+At this point you could log this information; send an email or sms; its in your hands.. 
+
