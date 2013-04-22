@@ -57,15 +57,17 @@ This options settings contains:
  
 ## supported types
 ===========
+
 We currently support the ability to monitor:
 
 A get request
 
 ```
 {
-	type: "api",
-    host: "http://airasoul.net",
-    enabled : true
+	name: "api for airasoul.net",
+  type: "api",
+  host: "http://airasoul.net",
+  enabled : true
  }
 ```
 
@@ -74,13 +76,29 @@ A rabbitmq server (send message to queue; and consume it)
 
 ```
 { 
-    host: "rabbit-server"
-    , port: 5672
-    , login: 'guest'
-    , password: 'guest'
-    , vhost: '/'
+  name: "local rabbitmq",
+  host: "localhost",
+  port: 5672,
+  login: "guest",
+  password: "guest",
+  vhost: '/',
+  enabled : true,
+  type: "rabbit"
 }
 ```
+
+A mongodb database; (opens a connection against the db )
+
+```
+{ 
+  name: "local mongo",
+  type: "mongo",
+  host: "localhost",
+  database: "staging",
+  port: 27017
+}
+```
+
   
 ## example
 ===========
@@ -102,15 +120,17 @@ superGrass.on('snitch', function(report) {
 The report returned contains an array of activity; each resource is returned with a failure identifier; each line in the report represents a single retry.
 
 ```
- {url: http://airasoul.net, fails: 1},
- {url: http://airasoul.net, fails: 1},
- {url: http://airasoul.net, fails: 1},
- {url: http://blog.airasoul.net, fails: 1},
- {url: http://blog.airasoul.net, fails: 1},
- {url: http://blog.airasoul.net, fails: 1},
- {url: http://rabbit-server, fails: 1},
- {url: http://rabbit-server, fails: 1},
- {url: http://rabbit-server, fails: 1}
+{ name: 'api for airasoul.net', fails: 0 },
+{ name: 'api for airasoul.net', fails: 0 },
+{ name: 'api for 127', fails: 1 },
+{ name: 'api for 127', fails: 1 },
+{ name: 'api for 127', fails: 1 },
+{ name: 'local mongo', fails: 0 },
+{ name: 'local mongo', fails: 0 },
+{ name: 'local mongo', fails: 0 },
+{ name: 'local rabbitmq', fails: 0 },
+{ name: 'local rabbitmq', fails: 0 },
+{ name: 'local rabbitmq', fails: 0 } 
 
 ```
 At this point you could log this information; send an email or sms; its in your hands.. 
