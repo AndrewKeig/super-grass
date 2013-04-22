@@ -1,21 +1,15 @@
 #super-grass
-===========
-
-A node.js monitoring tool supporting apis, mongodb and rabbitmq.
-
-This tool allows you to define various resources to be monitored for heatbeats; at a configurable interval.  A report is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferd form of notificaion and/or logging.
 
 
-## TODO
-===========
+A node.js monitoring tool supporting apis, redis, mongodb and rabbitmq.
 
-* Support REST POST/PUT/DELETE requests
-* An administration tool which lists the running processes for each supported type
+This tool allows you to define various resources to be monitored for a heatbeat; at a configurable interval.  
 
+A report is generated at these intervals and an event is fired; which you can hook into allowing you to 
+analyse and then perform your preferd form of notificaion and/or logging.
 
 
 ## options
-===========
 
 
 In order to use super-grass; simply create an options object with the following properties.
@@ -77,7 +71,6 @@ This options settings contains:
 
  
 ## supported types
-===========
 
 We currently support the ability to monitor:
 
@@ -85,7 +78,7 @@ A http get request
 
 ```
 {
-	name: "api for airasoul.net",
+  name: "api for airasoul.net",
   type: "api",
   host: "http://airasoul.net",
   enabled : true
@@ -108,7 +101,7 @@ A rabbitmq server (send message to queue; and consume it)
 }
 ```
 
-A mongodb database; (opens a connection against the db )
+A mongodb database; (opens a connection)
 
 ```
 { 
@@ -120,7 +113,7 @@ A mongodb database; (opens a connection against the db )
 }
 ```
 
-A redis store (opens a connection )
+A redis store; (opens a connection)
 
 ```
 {
@@ -134,7 +127,6 @@ A redis store (opens a connection )
 
   
 ## example
-===========
 
 The code is simple; you create a ```super-grass``` object; start watching and wait for a response; the ```snitch``` event to fire.
 
@@ -174,3 +166,12 @@ The report returned contains an array of activity; each resource is returned wit
 
 At this point you could log this information; send an email or sms; its in your hands.. 
 
+
+## todo
+
+
+* Support REST POST/PUT/DELETE requests
+* An administration tool which lists the reported activity
+
+
+.
