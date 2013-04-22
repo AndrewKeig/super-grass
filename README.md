@@ -1,7 +1,17 @@
-#super-grass
+.
 
 
-A node.js monitoring tool supporting apis, redis, mongodb and rabbitmq.
+```
+  ___ _   _ _ __   ___ _ __    __ _ _ __ __ _ ___ ___ 
+ / __| | | | '_ \ / _ \ '__|  / _` | '__/ _` / __/ __|
+ \__ \ |_| | |_) |  __/ |    | (_| | | | (_| \__ \__ \
+ |___/\__,_| .__/ \___|_|     \__, |_|  \__,_|___/___/
+           | |                 __/ |                  
+           |_|                |___/                   
+
+```
+
+super grass is a node.js monitoring tool supporting apis, redis, mongodb and rabbitmq.
 
 This tool allows you to define various resources to be monitored for a heatbeat; at a configurable interval.  
 
