@@ -22,7 +22,15 @@ module.exports = {
     type: "mongo",
     host: "localhost",
     database: "staging",
-    port: 27017
+    port: 27017,
+    enabled : true
+  },
+  {
+    name: "redis local",
+    type: "redis",
+    host: "http://127.0.0.1",
+    port: 6379,
+    enabled : true
   },
   {
     name: "local rabbitmq",

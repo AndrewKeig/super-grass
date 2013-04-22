@@ -9,7 +9,7 @@ This tool allows you to define various resources to be monitored for heatbeats; 
 ## TODO
 ===========
 
-* Support Redis, REST POST/PUT/DELETE requests
+* Support REST POST/PUT/DELETE requests
 * An administration tool which lists the running processes for each supported type
 
 
@@ -46,6 +46,13 @@ module.exports = {
     host: "localhost",
     database: "staging",
     port: 27017
+  },
+    {
+    name: "redis local",
+    type: "redis",
+    host: "http://127.0.0.1",
+    port: 6379,
+    enabled : true
   },
   {
     name: "local rabbitmq",
@@ -113,6 +120,18 @@ A mongodb database; (opens a connection against the db )
 }
 ```
 
+A redis store (opens a connection )
+
+```
+{
+  name: "redis local",
+  type: "redis",
+  host: "http://127.0.0.1",
+  port: 6379,
+  enabled : true
+}
+```
+
   
 ## example
 ===========
@@ -128,24 +147,30 @@ superGrass.watch();
 
 superGrass.on('snitch', function(report) {
   console.log("RESULTS", report);
+  //mail here
+  //log here
 });
 ```
 
 The report returned contains an array of activity; each resource is returned with a failure identifier; each line in the report represents a single retry.
 
 ```
-{ name: 'api for airasoul.net', fails: 0 },
-{ name: 'api for airasoul.net', fails: 0 },
-{ name: 'api for 127', fails: 1 },
-{ name: 'api for 127', fails: 1 },
-{ name: 'api for 127', fails: 1 },
-{ name: 'local mongo', fails: 0 },
-{ name: 'local mongo', fails: 0 },
-{ name: 'local mongo', fails: 0 },
-{ name: 'local rabbitmq', fails: 0 },
-{ name: 'local rabbitmq', fails: 0 },
-{ name: 'local rabbitmq', fails: 0 } 
-
+{ name: 'api for airasoul.net', failed: false },
+{ name: 'api for airasoul.net', failed: false },
+{ name: 'api for airasoul.net', failed: false },
+{ name: 'api for 127', failed: true },
+{ name: 'api for 127', failed: true },
+{ name: 'api for 127', failed: true },
+{ name: 'local mongo', failed: true },
+{ name: 'local mongo', failed: true },
+{ name: 'local mongo', failed: true },
+{ name: 'redis local', failed: false },
+{ name: 'redis local', failed: false },
+{ name: 'redis local', failed: false },
+{ name: 'local rabbitmq', failed: false },
+{ name: 'local rabbitmq', failed: false },
+{ name: 'local rabbitmq', failed: false }
 ```
+
 At this point you could log this information; send an email or sms; its in your hands.. 
 
