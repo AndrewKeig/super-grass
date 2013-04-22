@@ -1,14 +1,15 @@
 #super-grass
 ===========
 
-A node.js monitoring tool supporting apis and rabbitmq.
+A node.js monitoring tool supporting apis, mongodb and rabbitmq.
 
-This tool will allows you to define various resources to be monitored; at a configurable interval.  A report is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferd form of notificaion and/or logging.
+This tool allows you to define various resources to be monitored for heatbeats; at a configurable interval.  A report is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferd form of notificaion and/or logging.
 
 
 ## TODO
 ===========
-* Support MongoDb and Redis, REST POST/PUT/DELETE requests
+
+* Support Redis, REST POST/PUT/DELETE requests
 * An administration tool which lists the running processes for each supported type
 
 
@@ -16,10 +17,11 @@ This tool will allows you to define various resources to be monitored; at a conf
 ## options
 ===========
 
+
 In order to use super-grass; simply create an options object with the following properties.
 
 ```
-options = {
+module.exports = {
   settings: {
     interval: "5000",
     retry: "3",
@@ -27,24 +29,36 @@ options = {
   }
 , resources: 
   [{
+    name: "api for airasoul.net",
     type: "api",
     host: "http://airasoul.net",
     enabled : true
   },
   {
+    name: "api for 127",
     type: "api",
-    host: "http://blog.airasoul.net",
+    host: "http://127.0.0.1:2000",
     enabled : true
   },
-  { host: "rabbit-server"
-    , port: 5672
-    , login: "guest"
-    , password: "guest"
-    , vhost: '/'
-    , enabled : true
-    , type: "rabbit"
+  { 
+    name: "local mongo",
+    type: "mongo",
+    host: "localhost",
+    database: "staging",
+    port: 27017
+  },
+  {
+    name: "local rabbitmq",
+    host: "localhost",
+    port: 5672,
+    login: "guest",
+    password: "guest",
+    vhost: '/',
+    enabled : true,
+    type: "rabbit"
   }]
-};
+}
+
 ```
 
 This options settings contains:
@@ -60,7 +74,7 @@ This options settings contains:
 
 We currently support the ability to monitor:
 
-A get request
+A http get request
 
 ```
 {
