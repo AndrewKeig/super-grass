@@ -139,7 +139,7 @@ A redis store
 The code is simple; you create a ```super-grass``` object; start watching and wait for a response; the ```snitch``` event to fire.
 
 ```
-var SuperGrass = require('supergrass')
+var SuperGrass = require('super-grass')
     , options = require('./options');
 
 var superGrass = new SuperGrass(options);
