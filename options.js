@@ -12,9 +12,9 @@ module.exports = {
     enabled : true
   },
   {
-    name: "api for 127",
+    name: "api for blog.airasoul.net",
     type: "api",
-    host: "http://127.0.0.1:2000",
+    host: "http://blog.airasoul.net",
     enabled : true
   },
   { 
@@ -34,10 +34,10 @@ module.exports = {
   },
   {
     name: "local rabbitmq",
+    type: "rabbit",
     host: "http://127.0.0.1:15672/api/overview",
     username: "guest",
     password: "guest",
-    enabled : true,
-    type: "rabbit"
+    enabled : true
   }]
 }

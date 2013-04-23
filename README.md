@@ -11,7 +11,7 @@
 
 ```
 
-super grass is a node.js monitoring tool supporting apis, redis, mongodb and rabbitmq.
+super grass is a node.js monitoring tool supporting web apis, redis, mongodb and rabbitmq.
 
 This tool allows you to define various resources to be monitored for a heatbeat; at a configurable interval.  
 
@@ -29,7 +29,7 @@ module.exports = {
   settings: {
     interval: "10000",
     retry: "3",
-    retryTimeout: "1000"
+    retryTimeout: "500"
   }
 , resources: 
   [{
@@ -39,9 +39,9 @@ module.exports = {
     enabled : true
   },
   {
-    name: "api for 127",
+    name: "api for blog.airasoul.net",
     type: "api",
-    host: "http://127.0.0.1:2000",
+    host: "http://blog.airasoul.net",
     enabled : true
   },
   { 
@@ -61,11 +61,11 @@ module.exports = {
   },
   {
     name: "local rabbitmq",
+    type: "rabbit",
     host: "http://127.0.0.1:15672/api/overview",
     username: "guest",
     password: "guest",
-    enabled : true,
-    type: "rabbit"
+    enabled : true
   }]
 }
 
