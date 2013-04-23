@@ -27,7 +27,7 @@ In order to use super-grass; simply create an options object with the following 
 ```
 module.exports = {
   settings: {
-    interval: "5000",
+    interval: "10000",
     retry: "3",
     retryTimeout: "1000"
   }
@@ -49,9 +49,10 @@ module.exports = {
     type: "mongo",
     host: "localhost",
     database: "staging",
-    port: 27017
+    port: 27017,
+    enabled : true
   },
-    {
+  {
     name: "redis local",
     type: "redis",
     host: "http://127.0.0.1",
@@ -60,15 +61,14 @@ module.exports = {
   },
   {
     name: "local rabbitmq",
-    host: "localhost",
-    port: 5672,
-    login: "guest",
+    host: "http://127.0.0.1:15672/api/overview",
+    username: "guest",
     password: "guest",
-    vhost: '/',
     enabled : true,
     type: "rabbit"
   }]
 }
+
 
 ```
 
@@ -95,23 +95,21 @@ A http get request
  }
 ```
 
-A rabbitmq server (send message to queue; and consume it)
+A rabbitmq server 
 
 
 ```
 { 
   name: "local rabbitmq",
-  host: "localhost",
-  port: 5672,
-  login: "guest",
+  host: "http://127.0.0.1:15672/api/overview",
+  username: "guest",
   password: "guest",
-  vhost: '/',
   enabled : true,
   type: "rabbit"
 }
 ```
 
-A mongodb database; (opens a connection)
+A mongodb database
 
 ```
 { 
@@ -123,7 +121,7 @@ A mongodb database; (opens a connection)
 }
 ```
 
-A redis store; (opens a connection)
+A redis store
 
 ```
 {

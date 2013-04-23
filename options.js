@@ -1,8 +1,8 @@
 module.exports = {
   settings: {
-    interval: "5000",
+    interval: "10000",
     retry: "3",
-    retryTimeout: "1000"
+    retryTimeout: "500"
   }
 , resources: 
   [{
@@ -34,11 +34,9 @@ module.exports = {
   },
   {
     name: "local rabbitmq",
-    host: "localhost",
-    port: 5672,
-    login: "guest",
+    host: "http://127.0.0.1:15672/api/overview",
+    username: "guest",
     password: "guest",
-    vhost: '/',
     enabled : true,
     type: "rabbit"
   }]
