@@ -22,7 +22,7 @@ A ```report``` is generated at these intervals and an event is fired; which you 
 
 Super grass includes with a ```management ui``` which allows you to check the status of your resources.
 
-It also includes an option to ```log to console``` and an ```emailer``` which lists the resource status in a table.
+It also includes an option to lists the resource status to a table and ```log to console``` and/or ```send in email``` 
 
 
 
@@ -171,7 +171,13 @@ Our management ui allows us todo two things:
 
 * monitor the status of the resources in configuration.
 * start/stop sending emails
+	
 
+The management ui has three endpoints:
+
+* View status - /status
+* Start sending emails - /start
+* Stop sending emails - /stop
 
 
 ## todo

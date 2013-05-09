@@ -1,8 +1,8 @@
 module.exports = {
   settings: {
-    interval: "0",
+    interval: "1000",
     retry: "3",
-    retryTimeout: "0",
+    retryTimeout: "500",
     email: {
       login: "you@somewhere.com",
       password: "password",

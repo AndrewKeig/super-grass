@@ -5,5 +5,5 @@ var SuperGrass = require('./lib/supergrass')
 superGrass.watch();
 superGrass.on('snitch', function(report) {
   superGrass.print(report);
- // superGrass.email(report);
+  superGrass.email(report);
 });
