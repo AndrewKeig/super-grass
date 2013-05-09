@@ -18,7 +18,13 @@ super grass is a node.js monitoring tool supporting:
 
 This tool allows you to define various resources to be monitored for a ```heatbeat```; at a ```configurable interval```.
 
-A ```report``` is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferd form of notification and/or logging.
+A ```report``` is generated at these intervals and an event is fired; which you can hook into allowing you to analyse and then perform your preferred form of notification and/or logging.
+
+Super grass includes with a ```management ui``` which allows you to check the status of your resources.
+
+It also includes an option to ```log to console``` and an ```emailer``` which lists the resource status in a table.
+
+
 
 
 ## example
@@ -166,10 +172,6 @@ Our management ui allows us todo two things:
 * monitor the status of the resources in configuration.
 * start/stop sending emails
 
-
-
-
-![image](http://)
 
 
 ## todo
