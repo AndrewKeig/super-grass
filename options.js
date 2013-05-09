@@ -1,8 +1,16 @@
 module.exports = {
   settings: {
-    interval: "10000",
+    interval: "0",
     retry: "3",
-    retryTimeout: "500"
+    retryTimeout: "0",
+    email: {
+      login: "you@somewhere.com",
+      password: "password",
+      to: "you@somewhere.com",
+      from : "you@somewhere.com",
+      fromName : "Airasoul"
+    },
+    server: { port : 3000 }
   }
 , resources: 
   [{
@@ -34,8 +42,8 @@ module.exports = {
   },
   {
     name: "local rabbitmq",
-    type: "rabbit",
-    host: "http://127.0.0.1:15672/api/overview",
+    type: "basicauth", 
+    host: "http://127.0.0.1:15672/api/aliveness-test/%2F",
     username: "guest",
     password: "guest",
     enabled : true

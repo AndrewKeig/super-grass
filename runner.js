@@ -1,9 +1,9 @@
-var SuperGrass = require('./lib/supergrass');
-var options = require('./options');
+var SuperGrass = require('./lib/supergrass')
+, options = require('./options')
+, superGrass = new SuperGrass(options);
 
-var superGrass = new SuperGrass(options);
 superGrass.watch();
-
 superGrass.on('snitch', function(report) {
-  console.log("RESULTS", report);
+  superGrass.print(report);
+ // superGrass.email(report);
 });

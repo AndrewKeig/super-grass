@@ -1,0 +1,38 @@
+
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>{{title}}</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <style>
+    header { margin: 0 auto 0 auto; width: 428px; text-align: left; font-family: arial; margin-bottom: 20px; }
+    table { margin-left: auto; margin-right: auto; border-collapse:collapse;}
+    table,th, td { font-family: arial }
+    table  { width:30%;}
+    th { height:50px;}
+  </style>
+</head>
+<body>
+  <header>
+    {{title}} - {{send_emails}} {{#if sending}} <a href="/stop">stop emails</a>{{else}}<a href="/start">start emails</a>{{/if}}
+  </header>
+  <section>
+    <table>
+      <tr>
+      <td><b>Name</b></td>
+      <td><b>Status</b></td>
+    </tr>
+     {{#each items}}
+    <tr>
+      <td>{{name}}</td>
+      <td>{{status}}</td>
+    </tr>
+    {{/each}}
+  </table>
+  </section>
+  <footer>
+  </footer>
+</body>
+</html>
