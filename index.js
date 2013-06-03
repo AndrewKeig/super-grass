@@ -1,5 +1,5 @@
 var supergrass = require('./lib/supergrass');
 
-exports.version = '0.0.7';
+exports.version = '0.0.8';
 
 module.exports = supergrass;

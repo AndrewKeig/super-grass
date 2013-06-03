@@ -47,21 +47,21 @@ superGrass.on('snitch', function(report) {
 The report returned contains an array of activity; each resource is returned with a failure identifier; each line in the report represents a single retry.
 
 ```
-{ name: 'api for airasoul.net', failed: false },
-{ name: 'api for airasoul.net', failed: false },
-{ name: 'api for airasoul.net', failed: false },
-{ name: 'api for 127', failed: true },
-{ name: 'api for 127', failed: true },
-{ name: 'api for 127', failed: true },
-{ name: 'local mongo', failed: true },
-{ name: 'local mongo', failed: true },
-{ name: 'local mongo', failed: true },
-{ name: 'redis local', failed: false },
-{ name: 'redis local', failed: false },
-{ name: 'redis local', failed: false },
-{ name: 'local rabbitmq', failed: false },
-{ name: 'local rabbitmq', failed: false },
-{ name: 'local rabbitmq', failed: false }
+{ name: 'api for airasoul.net', status: Ok },
+{ name: 'api for airasoul.net', status: Ok  },
+{ name: 'api for airasoul.net', status: Ok  },
+{ name: 'api for 127', status: Down },
+{ name: 'api for 127', status: Down },
+{ name: 'api for 127', status: Down },
+{ name: 'local mongo', status: Down },
+{ name: 'local mongo', status: Down },
+{ name: 'local mongo', status: Down },
+{ name: 'redis local', status: Ok },
+{ name: 'redis local', status: Ok },
+{ name: 'redis local', status: Ok },
+{ name: 'local rabbitmq', status: Ok },
+{ name: 'local rabbitmq', status: Ok },
+{ name: 'local rabbitmq', status: Ok }
 ```
 
 At this point you could log this information; send an email or sms; its in your hands..
@@ -109,7 +109,7 @@ module.exports = {
   {
     name: "redis local",
     type: "redis",
-    host: "http://127.0.0.1",
+    host: "localhost",
     port: 6379,
     enabled : true
   },
