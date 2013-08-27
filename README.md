@@ -1,4 +1,3 @@
-
 ```
   ___ _   _ _ __   ___ _ __    __ _ _ __ __ _ ___ ___ 
  / __| | | | '_ \ / _ \ '__|  / _` | '__/ _` / __/ __|
@@ -7,6 +6,8 @@
            | |                 __/ |                  
            |_|                |___/                   
 ```
+
+[![NPM](https://nodei.co/npm/super-grass.png?downloads=true)](https://nodei.co/npm/super-grass/)
 
 super grass is a node.js monitoring tool supporting:
 
